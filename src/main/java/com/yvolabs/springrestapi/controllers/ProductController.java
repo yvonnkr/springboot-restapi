@@ -1,14 +1,17 @@
 package com.yvolabs.springrestapi.controllers;
 
 import com.yvolabs.springrestapi.entities.Product;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.yvolabs.springrestapi.services.ProductJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class ProductController {
+    @Autowired
+    private ProductJpaRepository productService;
 
     @GetMapping("/welcome")
     public String sayHi(){
@@ -24,17 +27,47 @@ public class ProductController {
 
     @GetMapping("/products")
     public List<Product> getProducts(){
-        List<Product> products = new ArrayList<>();
 
-        Product product1 = new Product(1,"productA",10);
-        Product product2 = new Product(2,"productB",20);
-        Product product3 = new Product(3,"productC",30);
+        return productService.findAll();
+//        List<Product> products = new ArrayList<>();
+//
+//        Product product1 = new Product(1,"productA",10);
+//        Product product2 = new Product(2,"productB",20);
+//        Product product3 = new Product(3,"productC",30);
+//
+//        products.add(product1);
+//        products.add(product2);
+//        products.add(product3);
+//
+//        return products;
+    }
 
-        products.add(product1);
-        products.add(product2);
-        products.add(product3);
+    @GetMapping("/products/{id}")
+    public Product getProductById(@PathVariable int id){
+        return productService.findById(id).get();
+    }
 
-        return products;
+    @DeleteMapping("/products/{id}")
+    public String deleteProductById(@PathVariable int id){
+        productService.deleteById(id);
+        return "Product deleted";
+    }
+
+    @PostMapping("/products")
+    public Product addNewProduct(@RequestBody Product product){
+
+        return productService.save(product);
+    }
+
+    @PutMapping("/products/{id}")
+    public Product updateProduct(@RequestBody Product product, @PathVariable int id){
+        productService.findById(id).map(p -> {
+            p.setName(product.getName());
+            p.setPrice(product.getPrice());
+            return productService.save(p);
+        });
+
+        return product;
     }
 
 }
