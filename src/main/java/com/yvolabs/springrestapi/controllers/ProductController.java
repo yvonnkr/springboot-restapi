@@ -10,8 +10,11 @@ import java.util.List;
 
 @RestController
 public class ProductController {
-    @Autowired
-    private ProductJpaRepository productService;
+    private final ProductJpaRepository productService;
+
+    public ProductController(ProductJpaRepository productService) {
+        this.productService = productService;
+    }
 
     @GetMapping("/welcome")
     public String sayHi(){
